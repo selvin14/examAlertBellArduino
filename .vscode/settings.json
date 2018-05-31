@@ -1,2 +1,4 @@
 {
+    // Enable usage data and errors to be sent to Microsoft.
+    "telemetry.enableTelemetry": false
 }

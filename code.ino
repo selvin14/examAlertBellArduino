@@ -36,14 +36,21 @@ RtcDS3231<TwoWire> Rtc(Wire);
 // with the arduino pin number it is connected to
 const int rs = 12, en = 11, d4 = 7, d5 = 6, d6 = 5, d7 = 4;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+int mode = 1;   // counter for the number of button presses
 
 const int buttonPin0 = 2,buttonPin1 = 3;     // the number of the pushbutton pin
-const int ledPin =  14;      // the number of the LED pin
+const int relay =  14;      // the number of the LED pin
 
 // variables will change:
 volatile int buttonState = 0;         // variable for reading the pushbutton status
 
+int buzzer = 8;//the pin of the active buzzer
+
+
 void setup() {
+
+  pinMode(buzzer,OUTPUT);//initialize the buzzer pin as an output
+
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   // Print a message to the LCD.
@@ -54,7 +61,7 @@ void setup() {
   lcd.clear();
 
 //****************RTC*****************
-    Serial.begin(57600);
+    Serial.begin(9600);
 
     Serial.print("compiled: ");
     Serial.print(__DATE__);
@@ -114,7 +121,7 @@ void setup() {
 //**************RTC END*****************
 
   // initialize the LED pin as an output:
-  pinMode(ledPin, OUTPUT);
+  pinMode(relay, OUTPUT);
   // initialize the pushbutton pin as an input:
   pinMode(buttonPin0, INPUT_PULLUP);
     // initialize the pushbutton pin as an input:
@@ -126,8 +133,8 @@ void setup() {
 }
 
 void loop() {
-
-
+  // lcd.begin(16,2);
+// lcd.setCursor(0,1);
 
   //****************RTC*****************
 if (!Rtc.IsDateTimeValid()) 
@@ -159,11 +166,11 @@ if (!Rtc.IsDateTimeValid())
   // if it is, the buttonState is HIGH:
 //   if (buttonState == LOW) {
     // turn LED on:
-    digitalWrite(ledPin, digitalRead(buttonPin0));
+    digitalWrite(relay, digitalRead(buttonPin0));
 //   }
 //   else {
 //     // turn LED off:
-//     digitalWrite(ledPin, LOW);
+//     digitalWrite(relay, LOW);
 //   }
 
 
@@ -173,6 +180,140 @@ if (!Rtc.IsDateTimeValid())
     lcd.setCursor(14,1);
     lcd.print("Hi");
   }
+
+  if (digitalRead(buttonPin0) == LOW) {
+    lcd.setCursor(12,1);
+    lcd.print("Buzz");
+    shbell();
+  }
+
+  int hh = now.Hour();
+  int mm = now.Minute();
+  int ss = now.Second();
+
+ /*   //Mode Change Code for push button press
+  
+  buttonState = digitalRead(sw);
+  if (buttonState != lastButtonState) {
+    if (buttonState == HIGH)
+    {
+     if(mode!=4)
+        {mode++;}
+     else
+     {mode=1;}; 
+    }
+    }
+    
+    delay(50);
+    lastButtonState = buttonState;*/
+
+
+mode=1;
+//Mode Definition with preset times
+  switch (mode) {
+    case 1:
+      {
+        if (hh == 10 && mm == 50 && ss< 2)
+          shbell();
+        else if (hh == 11 && mm == 00 && ss< 2)
+          longbell();
+        else if (hh == 12 && mm == 00 && ss< 2)
+          shbell();
+        else if (hh == 13 && mm == 00 && ss< 2)
+          shbell();
+        else if (hh == 13 && mm == 50 && ss< 2)
+          medbell();
+        else if (hh == 14 && mm == 00 && ss< 2)
+          longbell();
+        else if (hh == 14 && mm == 50 && ss< 2)
+          shbell();
+        else if (hh == 15 && mm == 00 && ss< 2)
+          longbell();
+        else if (hh == 16 && mm == 00 && ss< 2)
+          shbell();
+        else if (hh == 17 && mm == 00 && ss< 2)
+          shbell();
+        else if (hh == 17 && mm == 50 && ss< 2)
+          shbell();
+        else if (hh == 18 && mm == 00 && ss< 2)
+        longbell();
+        else
+        off();
+      }
+        
+      break;
+
+    case 2:
+      {if (hh == 16 && mm == 30 && ss< 2)
+          longbell();
+        else if (hh == 16 && mm == 32 && ss< 2)
+          medbell();
+        else if (hh == 16 && mm == 34 && ss< 2)
+          medbell();
+        else if (hh == 16 && mm == 36 && ss< 2)
+          medbell();
+        else if (hh == 16 && mm == 38 && ss< 2)
+          medbell();
+        else if (hh == 16 && mm == 40 && ss< 2)
+          medbell();
+        else if (hh == 15 && mm == 30)
+          medbell();
+        else if (hh == 16 && mm == 300)
+          medbell();
+        else
+        off();}
+      break;
+
+    case 3: 
+      {
+         if (hh == 9 && mm == 15)
+          shbell();
+        else if (hh == 9 && mm == 20)
+          medbell();
+        else if (hh == 9 && mm == 30)
+          longbell();
+        else if (hh == 10 && mm == 00)
+          shbell();
+        else if (hh == 12 && mm == 20)
+          shbell();
+        else if (hh == 12 && mm == 30)
+         longbell();
+        else if (hh == 13 && mm == 45)
+          shbell();
+        else if (hh == 13 && mm == 50)
+          medbell();
+        else if (hh == 14 && mm == 00)
+          longbell();
+        else if (hh == 14 && mm == 30)
+          shbell();
+        else if (hh == 16 && mm == 50)
+          shbell();
+       else if (hh == 17 && mm == 00)
+        longbell();
+        else
+        off();
+      }
+       
+      break;
+
+    case 4: 
+      {
+        if (hh == 9 && mm == 00)
+          longbell();
+        else if (hh == 9 && mm == 30)
+          medbell();
+        else if (hh == 13 && mm == 00)
+          longbell();
+          else if (hh == 14 && mm == 00)
+          medbell();
+        else if (hh == 17 && mm == 00)
+          longbell();
+       else 
+       off();
+      }
+       
+      break;
+  }//switch statement ends here
 }
 
 #define countof(a) (sizeof(a) / sizeof(a[0]))
@@ -207,10 +348,56 @@ void lcdPrintTime(const RtcDateTime& now){
 
 void pin_ISR0() {
   buttonState = digitalRead(buttonPin0);
-  digitalWrite(ledPin, buttonState);
+  digitalWrite(relay, buttonState);
 }
 
 void pin_ISR1() {
     lcd.setCursor(14,1);
     lcd.print("Hi");
+}
+
+void shbell() { 
+    digitalWrite(relay, 0);           //Switches relay on
+    buzz();
+    delay(2000);                     //waits for 5 seconds 
+    digitalWrite(relay, 1);           //switches relay off
+    delay(10);
+    lcd.begin(16, 2);
+    delay(10);
+}
+
+void medbell() {
+    digitalWrite(relay, 0);           //Switches relay on
+    buzz();
+    delay(4000);                     //waits for 7 seconds 
+    digitalWrite(relay, 1);           //switches relay off
+    delay(10);
+    lcd.begin(16, 2);
+    delay(10);
+}
+
+void longbell() {
+  digitalWrite(relay, 0);           //Switches relay on
+  buzz();
+  delay(7000);                     //waits for 10 seconds 
+  digitalWrite(relay, 1);           //switches relay off
+  delay(10);
+  lcd.begin(16, 2);
+  delay(10);
+
+}
+
+void off() { 
+    digitalWrite(relay, HIGH);
+}
+
+void buzz(){
+  int i;
+  Serial.println("Buzz");
+  for(i=0;i<2000;i++){
+  digitalWrite(buzzer,HIGH);
+  delay(1);//wait for 1ms
+  digitalWrite(buzzer,LOW);
+  delay(1);//wait for 1ms
+  }
 }
